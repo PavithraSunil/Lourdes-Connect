@@ -3,9 +3,7 @@ import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 
 export const Toast = ({ message, type = 'success', onClose, duration = 4000 }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, duration);
+    const timer = setTimeout(onClose, duration);
     return () => clearTimeout(timer);
   }, [onClose, duration]);
 
@@ -13,30 +11,33 @@ export const Toast = ({ message, type = 'success', onClose, duration = 4000 }) =
     switch (type) {
       case 'error':
         return {
-          bg: 'rgba(239, 68, 68, 0.1)',
-          border: 'rgba(239, 68, 68, 0.25)',
-          color: '#ef4444',
+          bg: 'var(--danger-glow)',
+          border: 'rgba(220, 38, 38, 0.3)',
+          color: 'var(--danger)',
           icon: <XCircle size={18} />,
+          barColor: 'var(--danger)',
         };
       case 'info':
         return {
-          bg: 'rgba(99, 102, 241, 0.1)',
-          border: 'rgba(99, 102, 241, 0.25)',
-          color: '#6366f1',
+          bg: 'var(--primary-glow)',
+          border: 'var(--border-glow)',
+          color: 'var(--primary)',
           icon: <Info size={18} />,
+          barColor: 'var(--primary)',
         };
       case 'success':
       default:
         return {
-          bg: 'rgba(16, 185, 129, 0.1)',
-          border: 'rgba(16, 185, 129, 0.25)',
-          color: '#10b981',
+          bg: 'var(--success-glow)',
+          border: 'rgba(5, 150, 105, 0.3)',
+          color: 'var(--success)',
           icon: <CheckCircle size={18} />,
+          barColor: 'var(--success)',
         };
     }
   };
 
-  const style = getStyle();
+  const s = getStyle();
 
   return (
     <div
@@ -47,39 +48,46 @@ export const Toast = ({ message, type = 'success', onClose, duration = 4000 }) =
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        backgroundColor: style.bg,
-        border: `1px solid ${style.border}`,
-        borderRadius: '8px',
-        padding: '12px 16px',
-        color: style.color,
-        boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
-        backdropFilter: 'blur(8px)',
+        background: 'var(--bg-card)',
+        border: `1.5px solid ${s.border}`,
+        borderLeft: `4px solid ${s.barColor}`,
+        borderRadius: 'var(--radius-md)',
+        padding: '14px 18px',
+        color: 'var(--text-primary)',
+        boxShadow: 'var(--shadow-lg)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
         zIndex: 9999,
-        fontFamily: 'var(--font-accent)',
+        fontFamily: 'var(--font-primary)',
         fontWeight: '500',
         fontSize: '0.9rem',
-        animation: 'fadeIn 0.25s ease-out forwards',
+        maxWidth: '380px',
+        animation: 'slideInDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+        minWidth: '260px',
       }}
     >
-      <span style={{ display: 'flex', alignItems: 'center' }}>{style.icon}</span>
-      <span>{message}</span>
+      <span style={{ display: 'flex', alignItems: 'center', color: s.color, flexShrink: 0 }}>
+        {s.icon}
+      </span>
+      <span style={{ flex: 1, color: 'var(--text-primary)', lineHeight: 1.4 }}>{message}</span>
       <button
         onClick={onClose}
         style={{
           background: 'none',
           border: 'none',
-          color: 'inherit',
+          color: 'var(--text-muted)',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           padding: '2px',
-          opacity: 0.7,
-          marginLeft: '4px',
+          borderRadius: '4px',
+          transition: 'var(--transition)',
+          flexShrink: 0,
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.7)}
+        onMouseEnter={(e) => { e.currentTarget.style.color = s.color; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
       >
-        <X size={14} />
+        <X size={15} />
       </button>
     </div>
   );
