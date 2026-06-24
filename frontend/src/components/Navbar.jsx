@@ -80,7 +80,7 @@ export const Navbar = ({ currentPath, navigate }) => {
             letterSpacing: '-0.5px',
           }}
         >
-          Aether<span style={{ color: 'var(--primary)' }}>Events</span>
+          Lourdes<span style={{ color: 'var(--primary)' }}>Connect</span>
         </span>
       </div>
 
