@@ -5,7 +5,7 @@ const path = require('path');
 
 const sendEntryPass = async (registration, event) => {
   try {
-    const { name, email, unique_code, department, semester } = registration;
+    const { name, email, unique_code, department, college, semester } = registration;
     const eventTitle = event.title;
     
     // Format Event Date
@@ -61,9 +61,21 @@ const sendEntryPass = async (registration, event) => {
             <td style="padding: 6px 0; color: #ffffff; font-size: 14px; font-weight: 700; text-align: right;">${name}</td>
           </tr>
           <tr>
-            <td style="padding: 6px 0; color: #94a3b8; font-size: 13px; font-weight: 500;">Affiliation</td>
-            <td style="padding: 6px 0; color: #ffffff; font-size: 14px; text-align: right;">${department || 'N/A'} ${semester ? `(${semester})` : ''}</td>
+            <td style="padding: 6px 0; color: #94a3b8; font-size: 13px; font-weight: 500;">Department</td>
+            <td style="padding: 6px 0; color: #ffffff; font-size: 14px; text-align: right;">${department || 'N/A'}</td>
           </tr>
+          ${college ? `
+          <tr>
+            <td style="padding: 6px 0; color: #94a3b8; font-size: 13px; font-weight: 500;">College</td>
+            <td style="padding: 6px 0; color: #ffffff; font-size: 14px; text-align: right;">${college}</td>
+          </tr>
+          ` : ''}
+          ${semester ? `
+          <tr>
+            <td style="padding: 6px 0; color: #94a3b8; font-size: 13px; font-weight: 500;">Semester</td>
+            <td style="padding: 6px 0; color: #ffffff; font-size: 14px; text-align: right;">${semester}</td>
+          </tr>
+          ` : ''}
           <tr>
             <td style="padding: 6px 0; color: #94a3b8; font-size: 13px; font-weight: 500;">Date</td>
             <td style="padding: 6px 0; color: #ffffff; font-size: 14px; text-align: right;">${eventDate}</td>

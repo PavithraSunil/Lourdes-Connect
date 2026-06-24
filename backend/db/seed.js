@@ -58,7 +58,7 @@ const seed = async () => {
         '09:00:00',
         new Date(tomorrow.setHours(8, 0, 0, 0)).toISOString(),
         50,
-        db.dbType === 'sqlite' ? JSON.stringify({ department: true, semester: true }) : { department: true, semester: true },
+        db.dbType === 'sqlite' ? JSON.stringify({ department: true, college: true, semester: true }) : { department: true, college: true, semester: true },
         'upcoming',
       ]
     );
@@ -77,7 +77,7 @@ const seed = async () => {
         '10:30:00',
         new Date(nextWeek.setHours(9, 0, 0, 0)).toISOString(),
         100,
-        db.dbType === 'sqlite' ? JSON.stringify({ department: true, semester: false }) : { department: true, semester: false },
+        db.dbType === 'sqlite' ? JSON.stringify({ department: true, college: false, semester: false }) : { department: true, college: false, semester: false },
         'upcoming',
       ]
     );
@@ -96,7 +96,7 @@ const seed = async () => {
         '14:00:00',
         new Date(yesterday.setHours(13, 0, 0, 0)).toISOString(),
         30,
-        db.dbType === 'sqlite' ? JSON.stringify({ department: false, semester: false }) : { department: false, semester: false },
+        db.dbType === 'sqlite' ? JSON.stringify({ department: false, college: false, semester: false }) : { department: false, college: false, semester: false },
         'completed',
       ]
     );
@@ -115,7 +115,7 @@ const seed = async () => {
         '11:00:00',
         new Date(today.setHours(23, 59, 0, 0)).toISOString(),
         20,
-        db.dbType === 'sqlite' ? JSON.stringify({ department: false, semester: false }) : { department: false, semester: false },
+        db.dbType === 'sqlite' ? JSON.stringify({ department: false, college: false, semester: false }) : { department: false, college: false, semester: false },
         'upcoming',
       ]
     );
@@ -126,19 +126,19 @@ const seed = async () => {
     
     // Registrations for Event 1 (AI bootcamp) - 5 students
     const studentsEvent1 = [
-      { name: 'Alice Smith', email: 'alice@college.edu', phone: '9876543210', dept: 'Computer Science', sem: '4th Semester' },
-      { name: 'Bob Johnson', email: 'bob@college.edu', phone: '9876543211', dept: 'Information Technology', sem: '6th Semester' },
-      { name: 'Charlie Brown', email: 'charlie@college.edu', phone: '9876543212', dept: 'Computer Science', sem: '4th Semester' },
-      { name: 'Diana Prince', email: 'diana@college.edu', phone: '9876543213', dept: 'Electrical Eng', sem: '2nd Semester' },
-      { name: 'Ethan Hunt', email: 'ethan@college.edu', phone: '9876543214', dept: 'Mathematics', sem: '8th Semester' },
+      { name: 'Alice Smith', email: 'alice@college.edu', phone: '9876543210', dept: 'Computer Science', college: 'Lourdes College', sem: '4th Semester' },
+      { name: 'Bob Johnson', email: 'bob@college.edu', phone: '9876543211', dept: 'Information Technology', college: 'Lourdes College', sem: '6th Semester' },
+      { name: 'Charlie Brown', email: 'charlie@college.edu', phone: '9876543212', dept: 'Computer Science', college: 'Aether Institute', sem: '4th Semester' },
+      { name: 'Diana Prince', email: 'diana@college.edu', phone: '9876543213', dept: 'Electrical Eng', college: 'Lourdes College', sem: '2nd Semester' },
+      { name: 'Ethan Hunt', email: 'ethan@college.edu', phone: '9876543214', dept: 'Mathematics', college: 'Science College', sem: '8th Semester' },
     ];
 
     for (const student of studentsEvent1) {
       const code = await generateUniqueCode();
       await db.query(
-        `INSERT INTO registrations (event_id, name, email, phone, department, semester, unique_code, attendance_status) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [event1Id, student.name, student.email, student.phone, student.dept, student.sem, code, 'absent']
+        `INSERT INTO registrations (event_id, name, email, phone, department, college, semester, unique_code, attendance_status) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [event1Id, student.name, student.email, student.phone, student.dept, student.college, student.sem, code, 'absent']
       );
     }
 

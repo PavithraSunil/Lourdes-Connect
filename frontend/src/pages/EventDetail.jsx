@@ -12,6 +12,7 @@ export const EventDetail = ({ eventId, navigate, setToast }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [department, setDepartment] = useState('');
+  const [college, setCollege] = useState('');
   const [semester, setSemester] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,6 +48,7 @@ export const EventDetail = ({ eventId, navigate, setToast }) => {
         email,
         phone,
         department: event.custom_fields?.department ? department : undefined,
+        college: event.custom_fields?.college ? college : undefined,
         semester: event.custom_fields?.semester ? semester : undefined,
       };
 
@@ -327,7 +329,7 @@ export const EventDetail = ({ eventId, navigate, setToast }) => {
 
                   {customFields.department && (
                     <div className="form-group">
-                      <label className="form-label">Department / College</label>
+                      <label className="form-label">Department</label>
                       <input
                         type="text"
                         className="form-input"
@@ -335,6 +337,20 @@ export const EventDetail = ({ eventId, navigate, setToast }) => {
                         placeholder="e.g. Computer Science"
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {customFields.college && (
+                    <div className="form-group">
+                      <label className="form-label">College</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        required
+                        placeholder="e.g. Lourdes College"
+                        value={college}
+                        onChange={(e) => setCollege(e.target.value)}
                       />
                     </div>
                   )}

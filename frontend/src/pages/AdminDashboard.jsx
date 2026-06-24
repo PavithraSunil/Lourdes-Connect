@@ -43,6 +43,7 @@ export const AdminDashboard = ({ setToast, navigate }) => {
   const [formCheckinEnd, setFormCheckinEnd] = useState('');
   const [formMaxCapacity, setFormMaxCapacity] = useState('');
   const [reqDept, setReqDept] = useState(false);
+  const [reqCollege, setReqCollege] = useState(false);
   const [reqSem, setReqSem] = useState(false);
   const [formStatus, setFormStatus] = useState('upcoming');
 
@@ -211,6 +212,7 @@ export const AdminDashboard = ({ setToast, navigate }) => {
     setFormCheckinEnd('');
     setFormMaxCapacity('');
     setReqDept(false);
+    setReqCollege(false);
     setReqSem(false);
     setFormStatus('upcoming');
     setIsEventModalOpen(true);
@@ -238,6 +240,7 @@ export const AdminDashboard = ({ setToast, navigate }) => {
     
     const customFields = event.custom_fields || {};
     setReqDept(!!customFields.department);
+    setReqCollege(!!customFields.college);
     setReqSem(!!customFields.semester);
     setFormStatus(event.status || 'upcoming');
     
@@ -259,6 +262,7 @@ export const AdminDashboard = ({ setToast, navigate }) => {
         max_capacity: formMaxCapacity ? parseInt(formMaxCapacity) : null,
         custom_fields: {
           department: reqDept,
+          college: reqCollege,
           semester: reqSem,
         },
         status: formStatus,
@@ -350,6 +354,7 @@ export const AdminDashboard = ({ setToast, navigate }) => {
       r.email.toLowerCase().includes(term) ||
       (r.phone && r.phone.toLowerCase().includes(term)) ||
       (r.department && r.department.toLowerCase().includes(term)) ||
+      (r.college && r.college.toLowerCase().includes(term)) ||
       (r.semester && r.semester.toLowerCase().includes(term))
     );
   });
@@ -573,6 +578,7 @@ export const AdminDashboard = ({ setToast, navigate }) => {
                               </td>
                               <td>
                                 <p style={{ fontSize: '0.9rem' }}>{student.department || 'N/A'}</p>
+                                {student.college && <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{student.college}</p>}
                                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{student.semester ? `Sem: ${student.semester}` : 'N/A'}</p>
                               </td>
                               <td>
@@ -873,6 +879,15 @@ export const AdminDashboard = ({ setToast, navigate }) => {
                 onChange={(e) => setReqDept(e.target.checked)}
               />
               Require Department
+            </label>
+
+            <label className="form-checkbox">
+              <input
+                type="checkbox"
+                checked={reqCollege}
+                onChange={(e) => setReqCollege(e.target.checked)}
+              />
+              Require College
             </label>
             
             <label className="form-checkbox">

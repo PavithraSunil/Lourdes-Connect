@@ -41,8 +41,15 @@ const initDb = () => {
               console.error('PostgreSQL schema migration error:', err);
               return reject(err);
             }
-            console.log('PostgreSQL schema migrated successfully.');
-            resolve();
+            // Run column migration
+            pool.query('ALTER TABLE registrations ADD COLUMN IF NOT EXISTS college VARCHAR(100);', (alterErr) => {
+              if (alterErr) {
+                console.error('PostgreSQL alter table error:', alterErr);
+                return reject(alterErr);
+              }
+              console.log('PostgreSQL schema migrated successfully.');
+              resolve();
+            });
           });
         } catch (schemaErr) {
           reject(schemaErr);
@@ -75,8 +82,21 @@ const initDb = () => {
               console.error('SQLite schema migration error:', err);
               return reject(err);
             }
-            console.log('SQLite schema migrated successfully.');
-            resolve();
+            // Run column migration
+            sqliteDb.run('ALTER TABLE registrations ADD COLUMN college VARCHAR(100);', (alterErr) => {
+              if (alterErr) {
+                if (alterErr.message.includes('duplicate column name')) {
+                  console.log('SQLite college column already exists.');
+                } else {
+                  console.error('SQLite alter table error:', alterErr);
+                  return reject(alterErr);
+                }
+              } else {
+                console.log('SQLite college column added successfully.');
+              }
+              console.log('SQLite schema migrated successfully.');
+              resolve();
+            });
           });
         } catch (schemaErr) {
           reject(schemaErr);

@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS registrations (
   email VARCHAR(150) NOT NULL,
   phone VARCHAR(20) NOT NULL,
   department VARCHAR(100),
+  college VARCHAR(100),
   semester VARCHAR(20),
   unique_code VARCHAR(10) UNIQUE NOT NULL,
   registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

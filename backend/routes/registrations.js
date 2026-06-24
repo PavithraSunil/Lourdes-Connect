@@ -22,7 +22,7 @@ const escapeCsvField = (val) => {
 router.post('/events/:id/register', async (req, res) => {
   try {
     const eventId = req.params.id;
-    const { name, email, phone, department, semester } = req.body;
+    const { name, email, phone, department, college, semester } = req.body;
     const cleanEmail = email.toLowerCase().trim();
 
     // 1. Basic validation
@@ -71,9 +71,12 @@ router.post('/events/:id/register', async (req, res) => {
       }
     }
 
-    // 5. Validate custom fields (department, semester) if required
+    // 5. Validate custom fields (department, college, semester) if required
     if (customFields.department && !department) {
       return res.status(400).json({ error: 'Department is required for this event.' });
+    }
+    if (customFields.college && !college) {
+      return res.status(400).json({ error: 'College is required for this event.' });
     }
     if (customFields.semester && !semester) {
       return res.status(400).json({ error: 'Semester is required for this event.' });
@@ -94,8 +97,8 @@ router.post('/events/:id/register', async (req, res) => {
     // 8. Save registration
     const insertQuery = `
       INSERT INTO registrations (
-        event_id, name, email, phone, department, semester, unique_code
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        event_id, name, email, phone, department, college, semester, unique_code
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `;
     const insertParams = [
@@ -104,6 +107,7 @@ router.post('/events/:id/register', async (req, res) => {
       cleanEmail,
       phone,
       department || null,
+      college || null,
       semester || null,
       uniqueCode,
     ];
@@ -183,7 +187,7 @@ router.get('/events/:id/registrations', authenticateToken, async (req, res) => {
     }
 
     const regRes = await db.query(
-      'SELECT id, name, email, phone, department, semester, unique_code, registered_at, attendance_status, checked_in_at, certificate_generated FROM registrations WHERE event_id = $1 ORDER BY registered_at DESC',
+      'SELECT id, name, email, phone, department, college, semester, unique_code, registered_at, attendance_status, checked_in_at, certificate_generated FROM registrations WHERE event_id = $1 ORDER BY registered_at DESC',
       [eventId]
     );
 
@@ -211,7 +215,7 @@ router.get('/events/:id/export', authenticateToken, async (req, res) => {
     }
 
     const regRes = await db.query(
-      `SELECT name, email, phone, department, semester, registered_at, attendance_status, checked_in_at, unique_code 
+      `SELECT name, email, phone, department, college, semester, registered_at, attendance_status, checked_in_at, unique_code 
        FROM registrations 
        WHERE event_id = $1 
        ORDER BY name ASC`,
@@ -221,7 +225,7 @@ router.get('/events/:id/export', authenticateToken, async (req, res) => {
     const registrations = regRes.rows;
 
     // Define CSV Headers
-    const headers = ['Name', 'Email', 'Phone', 'Department', 'Semester', 'Registration Time', 'Attendance Status', 'Check-in Time', 'Code'];
+    const headers = ['Name', 'Email', 'Phone', 'Department', 'College', 'Semester', 'Registration Time', 'Attendance Status', 'Check-in Time', 'Code'];
     
     // Format rows
     const csvRows = registrations.map(r => [
@@ -229,6 +233,7 @@ router.get('/events/:id/export', authenticateToken, async (req, res) => {
       escapeCsvField(r.email),
       escapeCsvField(r.phone),
       escapeCsvField(r.department),
+      escapeCsvField(r.college),
       escapeCsvField(r.semester),
       escapeCsvField(r.registered_at),
       escapeCsvField(r.attendance_status),
