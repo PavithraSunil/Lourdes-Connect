@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, CheckSquare, Award, ShieldAlert, LogOut, LayoutDashboard } from 'lucide-react';
+import { Calendar, CheckSquare, Award, ShieldAlert, LogOut, LayoutDashboard, User } from 'lucide-react';
 
 export const Navbar = ({ currentPath, navigate }) => {
   const adminToken = localStorage.getItem('admin_token');
@@ -100,8 +100,21 @@ export const Navbar = ({ currentPath, navigate }) => {
         </button>
       </div>
 
-      {/* Admin Session Profile */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      {/* Nav right: My Dashboard + Admin login/session */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Participant My Dashboard */}
+        <button
+          style={{
+            ...navItemStyle('/participant-dashboard'),
+            backgroundColor: currentPath === '/participant-dashboard' ? 'rgba(13,148,136,0.12)' : 'transparent',
+            borderColor: currentPath === '/participant-dashboard' ? 'rgba(13,148,136,0.3)' : 'transparent',
+            color: currentPath === '/participant-dashboard' ? 'var(--secondary)' : 'var(--text-secondary)',
+          }}
+          onClick={() => navigate('/participant-dashboard')}
+        >
+          <User size={15} />
+          My Dashboard
+        </button>
         {adminToken && adminUser ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button

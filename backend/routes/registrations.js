@@ -147,6 +147,35 @@ router.post('/events/:id/register', async (req, res) => {
   }
 });
 
+// GET /participants/:email/registrations - Get all registrations for a participant email
+router.get('/participants/:email/registrations', async (req, res) => {
+  try {
+    const email = decodeURIComponent(req.params.email).toLowerCase().trim();
+
+    const regRes = await db.query(
+      `SELECT r.id, r.event_id, r.name, r.email, r.phone, r.department, r.college, r.semester,
+              r.unique_code, r.registered_at, r.attendance_status, r.checked_in_at,
+              r.certificate_generated,
+              e.title as event_title, e.event_date, e.event_time, e.venue,
+              e.status as event_status, e.certificate_template_url
+       FROM registrations r
+       JOIN events e ON r.event_id = e.id
+       WHERE r.email = $1
+       ORDER BY e.event_date DESC`,
+      [email]
+    );
+
+    if (regRes.rows.length === 0) {
+      return res.status(404).json({ error: 'No registrations found for this email address.' });
+    }
+
+    res.json({ registrations: regRes.rows });
+  } catch (error) {
+    console.error('Participant lookup error:', error);
+    res.status(500).json({ error: 'Server error looking up participant registrations.' });
+  }
+});
+
 // GET /registrations/:code - Look up registration + event details by code (for check-in & certificates)
 router.get('/registrations/:code', async (req, res) => {
   try {

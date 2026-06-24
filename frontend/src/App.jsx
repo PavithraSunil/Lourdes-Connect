@@ -8,6 +8,7 @@ import CertificateClaim from './pages/CertificateClaim';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import EventManage from './pages/EventManage';
+import ParticipantDashboard from './pages/ParticipantDashboard';
 
 export const App = () => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -54,6 +55,11 @@ export const App = () => {
     // 5. Admin Dashboard Panel
     if (currentPath === '/admin-dashboard') {
       return <AdminDashboard setToast={setToast} navigate={navigate} />;
+    }
+
+    // 5b. Participant Dashboard
+    if (currentPath === '/participant-dashboard') {
+      return <ParticipantDashboard setToast={setToast} navigate={navigate} />;
     }
 
     // 6. Dynamic Route matching

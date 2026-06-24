@@ -47,6 +47,21 @@ export const AdminDashboard = ({ setToast, navigate }) => {
   const [reqSem, setReqSem] = useState(false);
   const [formStatus, setFormStatus] = useState('upcoming');
 
+  // Staff Management State (super_admin only)
+  const [staffName, setStaffName] = useState('');
+  const [staffEmail, setStaffEmail] = useState('');
+  const [staffPassword, setStaffPassword] = useState('');
+  const [staffRole, setStaffRole] = useState('admin');
+  const [staffAdminId, setStaffAdminId] = useState('');
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [showStaffPanel, setShowStaffPanel] = useState(false);
+
+  // Derive current admin user from local storage at render time
+  const adminUser = (() => {
+    try { return JSON.parse(localStorage.getItem('admin_user')); }
+    catch { return null; }
+  })();
+
   useEffect(() => {
     // Check auth
     const token = localStorage.getItem('admin_token');
@@ -334,6 +349,36 @@ export const AdminDashboard = ({ setToast, navigate }) => {
     setAdminViewMode(mode);
     setSearchTerm('');
     setStatusFilter('all');
+  };
+
+  const handleRegisterStaff = async (e) => {
+    e.preventDefault();
+    setStaffLoading(true);
+    try {
+      const token = localStorage.getItem('admin_token');
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: staffName,
+          email: staffEmail,
+          password: staffPassword,
+          role: staffRole,
+          adminId: staffAdminId,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create staff account.');
+      setToast({ message: `Staff account created for ${data.admin.name}!`, type: 'success' });
+      setStaffName(''); setStaffEmail(''); setStaffPassword(''); setStaffAdminId('');
+    } catch (err) {
+      setToast({ message: err.message, type: 'error' });
+    } finally {
+      setStaffLoading(false);
+    }
   };
 
   const formatDate = (dateStr) => {
@@ -1052,6 +1097,93 @@ export const AdminDashboard = ({ setToast, navigate }) => {
           </div>
         </form>
       </Modal>
+
+      {/* ── Manage Staff Section (super_admin only) ─────────────────── */}
+      {adminUser?.role === 'super_admin' && (
+        <div style={{ marginTop: '3rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '4px' }}>Manage Staff Accounts</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                Create login accounts for faculty and event coordinators. Requires Admin System ID.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowStaffPanel(!showStaffPanel)}
+              style={{ minWidth: '140px' }}
+            >
+              {showStaffPanel ? 'Hide Panel' : '+ Add Staff Account'}
+            </button>
+          </div>
+
+          {showStaffPanel && (
+            <div className="glass-card" style={{ borderLeft: '4px solid var(--accent-gold)', padding: '2rem' }}>
+              <form onSubmit={handleRegisterStaff}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">Full Name</label>
+                    <input
+                      type="text" className="form-input"
+                      required placeholder="e.g. Dr. Anita Mathew"
+                      value={staffName} onChange={e => setStaffName(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">Email Address</label>
+                    <input
+                      type="email" className="form-input"
+                      required placeholder="staff@lourdes.edu"
+                      value={staffEmail} onChange={e => setStaffEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">Temporary Password</label>
+                    <input
+                      type="password" className="form-input"
+                      required placeholder="Min 8 characters"
+                      minLength={8}
+                      value={staffPassword} onChange={e => setStaffPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">Role</label>
+                    <select
+                      className="form-input"
+                      value={staffRole} onChange={e => setStaffRole(e.target.value)}
+                    >
+                      <option value="admin">Admin (Event Coordinator)</option>
+                      <option value="super_admin">Super Admin</option>
+                    </select>
+                  </div>
+                  <div className="form-group" style={{ gridColumn: '1 / -1', margin: 0 }}>
+                    <label className="form-label">
+                      Admin System ID <span style={{ color: 'var(--danger)' }}>*</span>
+                    </label>
+                    <input
+                      type="password" className="form-input"
+                      required placeholder="Enter the system-wide Admin ID to authorize this action"
+                      value={staffAdminId} onChange={e => setStaffAdminId(e.target.value)}
+                    />
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+                      The same Admin System ID used to log in. Required to authorize account creation.
+                    </p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '1.5rem' }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowStaffPanel(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={staffLoading}>
+                    {staffLoading ? 'Creating...' : 'Create Staff Account'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+      )}
 
     </div>
   );
