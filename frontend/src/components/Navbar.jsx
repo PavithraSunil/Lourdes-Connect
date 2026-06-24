@@ -215,7 +215,7 @@ export const Navbar = ({ currentPath, navigate, theme, toggleTheme }) => {
             }}
           >
             <ShieldAlert size={14} />
-            Faculty Login
+            Admin
           </button>
         )}
       </div>
