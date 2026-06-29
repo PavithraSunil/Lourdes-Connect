@@ -6,11 +6,14 @@ import {
   Ticket, BarChart3, Search
 } from 'lucide-react';
 
-export const ParticipantDashboard = ({ setToast, navigate }) => {
+export const ParticipantDashboard = ({
+  setToast,
+  navigate,
+  participantEmail,
+  onParticipantLogin,
+  onParticipantLogout,
+}) => {
   const [email, setEmail] = useState('');
-  const [participantEmail, setParticipantEmail] = useState(
-    () => localStorage.getItem('participant_email') || null
-  );
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -47,13 +50,11 @@ export const ParticipantDashboard = ({ setToast, navigate }) => {
   const handleLogin = (e) => {
     e.preventDefault();
     const trimmed = email.trim().toLowerCase();
-    localStorage.setItem('participant_email', trimmed);
-    setParticipantEmail(trimmed);
+    onParticipantLogin(trimmed);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('participant_email');
-    setParticipantEmail(null);
+    onParticipantLogout();
     setRegistrations([]);
     setEmail('');
     setError(null);

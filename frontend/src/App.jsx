@@ -6,6 +6,7 @@ import EventDetail from './pages/EventDetail';
 import CheckIn from './pages/CheckIn';
 import CertificateClaim from './pages/CertificateClaim';
 import AdminLogin from './pages/AdminLogin';
+import AdminRegister from './pages/AdminRegister';
 import AdminDashboard from './pages/AdminDashboard';
 import EventManage from './pages/EventManage';
 import ParticipantDashboard from './pages/ParticipantDashboard';
@@ -13,6 +14,47 @@ import ParticipantDashboard from './pages/ParticipantDashboard';
 export const App = () => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [toast, setToast] = useState(null);
+
+  // ── Lifted Auth States ───────────────────────────────────────
+  const [adminToken, setAdminToken] = useState(() => localStorage.getItem('admin_token'));
+  const [adminUser, setAdminUser] = useState(() => {
+    try {
+      const user = localStorage.getItem('admin_user');
+      return user ? JSON.parse(user) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [participantEmail, setParticipantEmail] = useState(() => localStorage.getItem('participant_email'));
+
+  const handleAdminLogin = (token, user) => {
+    localStorage.setItem('admin_token', token);
+    localStorage.setItem('admin_user', JSON.stringify(user));
+    setAdminToken(token);
+    setAdminUser(user);
+    navigate('/admin-dashboard');
+  };
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    setAdminToken(null);
+    setAdminUser(null);
+    navigate('/admin-login');
+  };
+
+  const handleParticipantLogin = (email) => {
+    localStorage.setItem('participant_email', email);
+    setParticipantEmail(email);
+    navigate('/participant-dashboard');
+  };
+
+  const handleParticipantLogout = () => {
+    localStorage.removeItem('participant_email');
+    setParticipantEmail(null);
+    navigate('/participant-dashboard');
+  };
+  // ─────────────────────────────────────────────────────────────
 
   // ── Theme State ──────────────────────────────────────────────
   const [theme, setTheme] = useState(
@@ -47,6 +89,20 @@ export const App = () => {
 
   // Render routing logic
   const renderView = () => {
+    // ── Route Guards ───────────────────────────────────────────
+    if (adminToken) {
+      if (currentPath === '/participant-dashboard' || currentPath === '/certificates' || currentPath === '/admin-login' || currentPath === '/admin-register') {
+        setTimeout(() => navigate('/admin-dashboard'), 0);
+        return null;
+      }
+    } else if (participantEmail) {
+      if (currentPath === '/admin-dashboard' || currentPath === '/admin-login' || currentPath === '/admin-register') {
+        setTimeout(() => navigate('/participant-dashboard'), 0);
+        return null;
+      }
+    }
+    // ───────────────────────────────────────────────────────────
+
     if (currentPath === '/') {
       return <EventList navigate={navigate} />;
     }
@@ -57,13 +113,24 @@ export const App = () => {
       return <CertificateClaim setToast={setToast} navigate={navigate} />;
     }
     if (currentPath === '/admin-login') {
-      return <AdminLogin setToast={setToast} navigate={navigate} />;
+      return <AdminLogin setToast={setToast} navigate={navigate} onAdminLogin={handleAdminLogin} />;
+    }
+    if (currentPath === '/admin-register') {
+      return <AdminRegister setToast={setToast} navigate={navigate} onAdminLogin={handleAdminLogin} />;
     }
     if (currentPath === '/admin-dashboard') {
-      return <AdminDashboard setToast={setToast} navigate={navigate} />;
+      return <AdminDashboard setToast={setToast} navigate={navigate} onAdminLogout={handleAdminLogout} />;
     }
     if (currentPath === '/participant-dashboard') {
-      return <ParticipantDashboard setToast={setToast} navigate={navigate} />;
+      return (
+        <ParticipantDashboard
+          setToast={setToast}
+          navigate={navigate}
+          participantEmail={participantEmail}
+          onParticipantLogin={handleParticipantLogin}
+          onParticipantLogout={handleParticipantLogout}
+        />
+      );
     }
 
     // Pattern: /events/:id
@@ -94,7 +161,17 @@ export const App = () => {
 
   return (
     <div className="app-container">
-      <Navbar currentPath={currentPath} navigate={navigate} theme={theme} toggleTheme={toggleTheme} />
+      <Navbar
+        currentPath={currentPath}
+        navigate={navigate}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        adminToken={adminToken}
+        adminUser={adminUser}
+        participantEmail={participantEmail}
+        onAdminLogout={handleAdminLogout}
+        onParticipantLogout={handleParticipantLogout}
+      />
       <main className="main-content">
         {renderView()}
       </main>

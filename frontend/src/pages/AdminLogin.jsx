@@ -2,22 +2,18 @@ import React, { useState } from 'react';
 import { api } from '../utils/api';
 import { ShieldCheck, Mail, Lock, KeyRound } from 'lucide-react';
 
-export const AdminLogin = ({ setToast, navigate }) => {
+export const AdminLogin = ({ setToast, navigate, onAdminLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [adminId, setAdminId] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showAdminId, setShowAdminId] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post('/auth/login', { email, password, adminId });
-      localStorage.setItem('admin_token', res.token);
-      localStorage.setItem('admin_user', JSON.stringify(res.admin));
+      const res = await api.post('/auth/login', { email, password });
       setToast({ message: `Welcome back, ${res.admin.name}!`, type: 'success' });
-      navigate('/admin-dashboard');
+      onAdminLogin(res.token, res.admin);
     } catch (err) {
       console.error('Auth error:', err);
       setToast({ message: err.message || 'Authentication failed.', type: 'error' });
@@ -96,50 +92,7 @@ export const AdminLogin = ({ setToast, navigate }) => {
             </div>
           </div>
 
-          {/* Admin ID */}
-          <div className="form-group">
-            <label className="form-label">
-              Admin System ID
-              <span style={{ color: 'var(--danger)', marginLeft: '4px' }}>*</span>
-            </label>
-            <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
-                <KeyRound size={16} />
-              </span>
-              <input
-                id="admin-system-id"
-                type={showAdminId ? 'text' : 'password'}
-                className="form-input"
-                style={{ paddingLeft: '2.5rem', paddingRight: '3rem', letterSpacing: showAdminId ? '0' : '3px' }}
-                required
-                placeholder="Enter Admin System ID"
-                value={adminId}
-                onChange={(e) => setAdminId(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={() => setShowAdminId(!showAdminId)}
-                style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  fontSize: '0.75rem',
-                  fontFamily: 'var(--font-accent)',
-                  fontWeight: '600',
-                }}
-              >
-                {showAdminId ? 'HIDE' : 'SHOW'}
-              </button>
-            </div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-              The system-wide ID provided to authorized faculty and staff only.
-            </p>
-          </div>
+          {/* Admin ID removed */}
 
           <button
             type="submit"
@@ -179,6 +132,20 @@ export const AdminLogin = ({ setToast, navigate }) => {
             >
               visit your Participant Dashboard
             </button>.
+          </p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.75rem' }}>
+            Don&apos;t have an account?{' '}
+            <button
+              id="goto-register-btn"
+              onClick={() => navigate('/admin-register')}
+              style={{
+                background: 'none', border: 'none',
+                color: 'var(--primary)', fontFamily: 'var(--font-accent)',
+                fontWeight: '700', fontSize: '0.8rem', cursor: 'pointer', textDecoration: 'underline',
+              }}
+            >
+              Create one here
+            </button>
           </p>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { api } from '../utils/api';
 import Modal from '../components/Modal';
 import { Calendar, MapPin, Plus, Edit2, Trash2, Upload, FileSpreadsheet, Users, Award, BarChart3, AlertCircle, Search, Download, RefreshCw } from 'lucide-react';
 
-export const AdminDashboard = ({ setToast, navigate }) => {
+export const AdminDashboard = ({ setToast, navigate, onAdminLogout }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,7 +52,6 @@ export const AdminDashboard = ({ setToast, navigate }) => {
   const [staffEmail, setStaffEmail] = useState('');
   const [staffPassword, setStaffPassword] = useState('');
   const [staffRole, setStaffRole] = useState('admin');
-  const [staffAdminId, setStaffAdminId] = useState('');
   const [staffLoading, setStaffLoading] = useState(false);
   const [showStaffPanel, setShowStaffPanel] = useState(false);
 
@@ -66,7 +65,7 @@ export const AdminDashboard = ({ setToast, navigate }) => {
     // Check auth
     const token = localStorage.getItem('admin_token');
     if (!token) {
-      navigate('/admin-login');
+      onAdminLogout();
       return;
     }
     fetchData();
@@ -367,13 +366,12 @@ export const AdminDashboard = ({ setToast, navigate }) => {
           email: staffEmail,
           password: staffPassword,
           role: staffRole,
-          adminId: staffAdminId,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create staff account.');
       setToast({ message: `Staff account created for ${data.admin.name}!`, type: 'success' });
-      setStaffName(''); setStaffEmail(''); setStaffPassword(''); setStaffAdminId('');
+      setStaffName(''); setStaffEmail(''); setStaffPassword('');
     } catch (err) {
       setToast({ message: err.message, type: 'error' });
     } finally {
@@ -1157,19 +1155,7 @@ export const AdminDashboard = ({ setToast, navigate }) => {
                       <option value="super_admin">Super Admin</option>
                     </select>
                   </div>
-                  <div className="form-group" style={{ gridColumn: '1 / -1', margin: 0 }}>
-                    <label className="form-label">
-                      Admin System ID <span style={{ color: 'var(--danger)' }}>*</span>
-                    </label>
-                    <input
-                      type="password" className="form-input"
-                      required placeholder="Enter the system-wide Admin ID to authorize this action"
-                      value={staffAdminId} onChange={e => setStaffAdminId(e.target.value)}
-                    />
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                      The same Admin System ID used to log in. Required to authorize account creation.
-                    </p>
-                  </div>
+                  {/* Admin ID removed */}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '1.5rem' }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowStaffPanel(false)}>
